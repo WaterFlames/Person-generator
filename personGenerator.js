@@ -50,36 +50,6 @@ const personGenerator = {
             "id_10": "Татьяна"
         }
     }`,
-   patronymicMaleJson: `{
-        "count": 10,
-        "list": {
-            "id_1": "Иванович",
-            "id_2": "Петрович",
-            "id_3": "Сергеевич",
-            "id_4": "Александрович",
-            "id_5": "Дмитриевич",
-            "id_6": "Андреевич",
-            "id_7": "Михайлович",
-            "id_8": "Николаевич",
-            "id_9": "Олегович",
-            "id_10": "Владимирович"
-        }
-    }`,
-    patronymicFemaleJson: `{
-        "count": 10,
-        "list": {
-            "id_1": "Ивановна",
-            "id_2": "Петровна",
-            "id_3": "Сергеевна",
-            "id_4": "Александровна",
-            "id_5": "Дмитриевна",
-            "id_6": "Андреевна",
-            "id_7": "Михайловна",
-            "id_8": "Николаевна",
-            "id_9": "Олеговна",
-            "id_10": "Владимировна"
-        }
-    }`,
     jobMaleJson: `{
         "count": 10,
         "list": {
@@ -147,10 +117,34 @@ const personGenerator = {
             : this.randomValue(this.firstNameFemaleJson);
     },
 
-    randomPatronymic: function() {
-        return this.person.gender === this.GENDER_MALE 
-            ? this.randomValue(this.patronymicMaleJson) 
-            : this.randomValue(this.patronymicFemaleJson);
+    randomPatronymic: function(gender) {
+    const name = this.randomValue(this.firstNameMaleJson);
+    let base = '';
+    let malePatronymic = '';
+    let femalePatronymic = '';
+
+    if (name.endsWith('ий')) {
+        base = name.slice(0, -2);
+        malePatronymic = base + 'евич';
+        femalePatronymic = base + 'евна';
+    } else if (name.endsWith('ей')) {
+        base = name.slice(0, -2);
+        malePatronymic = base + 'евич';
+        femalePatronymic = base + 'евна';
+    } else if (name.endsWith('а')) {
+        base = name.slice(0, -1);
+        malePatronymic = base + 'ич';
+        femalePatronymic = base + 'ична';
+    } else if (name.endsWith('я')) {
+        base = name.slice(0, -1);
+        malePatronymic = base + 'ич';
+        femalePatronymic = base + 'ична';
+    } else {
+        malePatronymic = name + 'ович';
+        femalePatronymic = name + 'овна';
+    }
+
+    return gender === this.GENDER_FEMALE ? femalePatronymic : malePatronymic;
     },
 
     randomGender: function() {
@@ -183,7 +177,7 @@ const personGenerator = {
         this.person.gender = this.randomGender();
         this.person.firstName = this.randomFirstName();
         this.person.surname = this.randomSurname();
-        this.person.patronymic = this.randomPatronymic();
+        this.person.patronymic = this.randomPatronymic(this.person.gender);
         this.person.job = this.randomJob();
         const birthDate = this.randomBirthDate();
         this.person.birthDay = birthDate.day;
